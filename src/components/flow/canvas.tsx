@@ -11,7 +11,7 @@ import { Edge } from "@/components/flow/edge";
 import { GridBackground } from "@/components/flow/grid-background";
 import { ZoomControls } from "@/components/flow/zoom-controls";
 import { FlowNode } from "@/types";
-import { CANVAS_WORLD_SIZE, CANVAS_DEFAULT_HEIGHT } from "@/constants"; // <-- 引入常量
+import { CANVAS_WORLD_SIZE } from "@/constants"; // <-- 引入常量
 
 // ⚠️ 移除硬编码的缩放常量和相关的计算函数
 
@@ -40,7 +40,7 @@ export function Canvas() {
     <div
       ref={canvasRef} // 绑定 ref
       className={`
-        w-full h-[${CANVAS_DEFAULT_HEIGHT}] border-2 border-gray-300 relative overflow-hidden rounded-lg 
+        size-full border-2 border-gray-300 relative overflow-hidden rounded-lg 
         bg-gray-50 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}
       `}
       {...handlers}

@@ -40,9 +40,6 @@ export const CANVAS_WORLD_SIZE = 4000;
 /** 网格背景点阵尺寸 (20px 间隔) */
 export const GRID_SIZE = 20;
 
-/** 画布默认高度 */
-export const CANVAS_DEFAULT_HEIGHT = "600px";
-
 // ===================================
 // 初始数据
 // ===================================
