@@ -11,6 +11,7 @@ export function Node({ id, x, y, label }: NodeProps) {
   const isDraggingRef = useRef(false);
   const dragStartRef = useRef({ x: 0, y: 0, nodeX: 0, nodeY: 0 });
 
+  // 鼠标事件处理
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.button !== 0) return;
 
@@ -51,6 +52,48 @@ export function Node({ id, x, y, label }: NodeProps) {
     document.addEventListener("mouseup", handleMouseUp);
   };
 
+  // 触摸事件处理
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length !== 1) return;
+
+    e.stopPropagation(); // 防止触发画布拖拽
+    e.preventDefault();
+
+    const touch = e.touches[0];
+    isDraggingRef.current = true;
+    dragStartRef.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+      nodeX: x,
+      nodeY: y,
+    };
+
+    const handleTouchMove = (moveEvent: TouchEvent) => {
+      if (!isDraggingRef.current || moveEvent.touches.length !== 1) return;
+
+      const touch = moveEvent.touches[0];
+      const dx = (touch.clientX - dragStartRef.current.x) / zoom;
+      const dy = (touch.clientY - dragStartRef.current.y) / zoom;
+
+      updateNodePosition(
+        id,
+        dragStartRef.current.nodeX + dx,
+        dragStartRef.current.nodeY + dy
+      );
+    };
+
+    const handleTouchEnd = () => {
+      isDraggingRef.current = false;
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchEnd);
+      document.removeEventListener("touchcancel", handleTouchEnd);
+    };
+
+    document.addEventListener("touchmove", handleTouchMove);
+    document.addEventListener("touchend", handleTouchEnd);
+    document.addEventListener("touchcancel", handleTouchEnd);
+  };
+
   return (
     <div
       id={`node-${id}`}
@@ -67,6 +110,7 @@ export function Node({ id, x, y, label }: NodeProps) {
         top: y,
       }}
       onMouseDown={handleMouseDown}
+      onTouchStart={handleTouchStart}
     >
       <strong className="font-semibold">{label}</strong>
     </div>
