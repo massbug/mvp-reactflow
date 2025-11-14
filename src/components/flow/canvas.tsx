@@ -19,10 +19,18 @@ export function Canvas() {
   const { viewport, nodes, edges, setViewport } = useFlowStore();
   const canvasRef = useRef<HTMLDivElement>(null); // 用于获取画布 DOM 元素
   
-  // 使用新的 Hook 封装缩放/平移逻辑
-  const { handleWheel, handleReset, handleZoomIn, handleZoomOut } = useFlowControls(canvasRef);
+  // 使用新的 Hook 封装缩放/平移逻辑（包含触摸事件）
+  const { 
+    handleWheel, 
+    handleReset, 
+    handleZoomIn, 
+    handleZoomOut,
+    handleTouchStart: handlePinchStart,
+    handleTouchMove: handlePinchMove,
+    handleTouchEnd: handlePinchEnd,
+  } = useFlowControls(canvasRef);
   
-  // 画布拖拽 Hook (保持不变)
+  // 画布拖拽 Hook（已支持鼠标和触摸）
   const { isDragging, handlers } = useCanvasDrag(viewport, setViewport);
 
   const nodeMap = useMemo(
@@ -36,6 +44,32 @@ export function Canvas() {
   
   // ⚠️ 移除 calculateNewViewport, handleZoom, handleWheel, handleReset 函数
 
+  // 合并触摸事件处理器
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length === 2) {
+      // 双指缩放
+      handlePinchStart(e);
+    } else if (e.touches.length === 1) {
+      // 单指拖拽
+      handlers.onTouchStart?.(e);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length === 2) {
+      // 双指缩放
+      handlePinchMove(e);
+    } else if (e.touches.length === 1) {
+      // 单指拖拽
+      handlers.onTouchMove?.(e);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    handlePinchEnd();
+    handlers.onTouchEnd?.();
+  };
+
   return (
     <div
       ref={canvasRef} // 绑定 ref
@@ -44,7 +78,10 @@ export function Canvas() {
         bg-gray-50 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}
       `}
       {...handlers}
-      onWheel={handleWheel} // 绑定 onWheel 事件
+      onWheel={handleWheel} // 绑定滚轮事件
+      onTouchStart={handleTouchStart} // 绑定触摸事件
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       <GridBackground offsetX={viewport.x} offsetY={viewport.y} />
 
