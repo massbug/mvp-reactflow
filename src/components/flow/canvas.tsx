@@ -77,6 +77,7 @@ export function Canvas() {
         size-full border-2 border-gray-300 relative overflow-hidden rounded-lg 
         bg-gray-50 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}
       `}
+      style={{ touchAction: 'none' }} // 阻止浏览器默认触摸行为
       {...handlers}
       onWheel={handleWheel} // 绑定滚轮事件
       onTouchStart={handleTouchStart} // 绑定触摸事件

@@ -43,6 +43,7 @@ export function useCanvasDrag(
       return;
     }
     
+    e.preventDefault(); // 阻止浏览器默认行为
     const touch = e.touches[0];
     setIsDragging(true);
     dragStartRef.current = {
@@ -56,6 +57,7 @@ export function useCanvasDrag(
   const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
     if (!isDragging || e.touches.length !== 1) return;
     
+    e.preventDefault(); // 阻止浏览器默认行为
     const touch = e.touches[0];
     const dx = touch.clientX - dragStartRef.current.x;
     const dy = touch.clientY - dragStartRef.current.y;
